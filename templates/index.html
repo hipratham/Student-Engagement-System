@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Roadmap Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f6f7ff 0%, #f0f3ff 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        .question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s forwards;
+        }
+        .question-card.active {
+            border: 2px solid #4f46e5;
+            box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.2);
+        }
+        .question-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .field-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+        .field-card.selected {
+            border-color: #4f46e5;
+            background: linear-gradient(135deg, #fafbff 0%, #f8f9ff 100%);
+        }
+        .field-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5, #818cf8);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        .field-card:hover::before {
+            transform: scaleX(1);
+        }
+        .field-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+        }
+        .field-card i {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: all 0.3s ease;
+        }
+        .field-card:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+        .question-number {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.2;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+        }
+        .option-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .option-card:hover {
+            border-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1);
+        }
+        .option-card.selected {
+            border-color: #4f46e5;
+            background: linear-gradient(135deg, #fafbff 0%, #f8f9ff 100%);
+        }
+        .option-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .option-card label {
+            cursor: pointer;
+            display: block;
+            padding: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 2rem;
+        }
+        .option-card label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .option-card label:after {
+            content: '';
+            position: absolute;
+            left: 0.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background: #4f46e5;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .option-card input[type="radio"]:checked + label:before {
+            border-color: #4f46e5;
+        }
+        .option-card input[type="radio"]:checked + label:after {
+            opacity: 1;
+        }
+        .option-card input[type="radio"]:checked + label {
+            color: #4f46e5;
+        }
+        .progress-bar {
+            height: 0.5rem;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #818cf8);
+            transition: width 0.5s ease;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        .nav-button {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-button.prev {
+            background: white;
+            color: #4f46e5;
+            border: 2px solid #4f46e5;
+        }
+        .nav-button.next {
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);
+        }
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px -2px rgba(79, 70, 229, 0.3);
+        }
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .file-upload {
+            background: white;
+            border: 2px dashed #e5e7eb;
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .file-upload:hover {
+            border-color: #4f46e5;
+            background: #fafbff;
+        }
+        .file-upload.dragging {
+            border-color: #4f46e5;
+            background: #f8f9ff;
+            transform: scale(1.02);
+        }
+        .upload-icon {
+            font-size: 3rem;
+            color: #4f46e5;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            background: #fee2e2;
+            color: #ef4444;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-12 animate-fade-in">
+            <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-indigo-400 bg-clip-text text-transparent">
+                Career Roadmap Generator
+            </h1>
+            <p class="text-xl text-gray-600">
+                Get a personalized 12-week roadmap for your engineering career journey
+            </p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+
+        <form id="roadmapForm" method="POST" enctype="multipart/form-data" class="space-y-8">
+            <!-- Step 1: Field Selection -->
+            <div id="step1" class="step-content">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Choose Your Field</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="field-card" data-field="computer" onclick="selectField('computer')">
+                        <i class="fas fa-laptop-code"></i>
+                        <h3 class="text-xl font-semibold mb-2">Computer Engineering</h3>
+                        <p class="text-gray-600">Software development, hardware design, and system architecture</p>
+                    </div>
+                    <div class="field-card" data-field="electrical" onclick="selectField('electrical')">
+                        <i class="fas fa-bolt"></i>
+                        <h3 class="text-xl font-semibold mb-2">Electrical Engineering</h3>
+                        <p class="text-gray-600">Power systems, electronics, and control systems</p>
+                    </div>
+                    <div class="field-card" data-field="civil" onclick="selectField('civil')">
+                        <i class="fas fa-building"></i>
+                        <h3 class="text-xl font-semibold mb-2">Civil Engineering</h3>
+                        <p class="text-gray-600">Structural design, construction, and infrastructure</p>
+                    </div>
+                    <div class="field-card" data-field="programmer" onclick="selectField('programmer')">
+                        <i class="fas fa-code"></i>
+                        <h3 class="text-xl font-semibold mb-2">Programming</h3>
+                        <p class="text-gray-600">Software development and application programming</p>
+                    </div>
+                    <div class="field-card cursor-pointer" onclick="window.location.href='/data-science'">
+                        <i class="fas fa-brain"></i>
+                        <h3 class="text-xl font-semibold mb-2">Data Science</h3>
+                        <p class="text-gray-600">Machine Learning, Data Analysis, and AI</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Questions -->
+            <div id="step2" class="step-content hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Tell Us About Yourself</h2>
+                {% for field, field_questions in questions.items() %}
+                <div id="{{ field }}_questions" class="field-questions hidden space-y-6">
+                    {% for question_index in range(field_questions|length) %}
+                    {% set q = field_questions[question_index] %}
+                    <div class="question-card" data-question="{{ question_index + 1 }}">
+                        <div class="question-number">{{ question_index + 1 }}</div>
+                        <h3 class="text-xl font-semibold mb-4 pr-16">{{ q.question }}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for option_index in range(q.options|length) %}
+                            <div class="option-card" onclick="selectOption(this)">
+                                <input type="radio" 
+                                       id="{{ field }}_q{{ question_index + 1 }}_opt{{ option_index + 1 }}"
+                                       name="q{{ question_index + 1 }}"
+                                       value="{{ q.options[option_index] }}">
+                                <label for="{{ field }}_q{{ question_index + 1 }}_opt{{ option_index + 1 }}">
+                                    {{ q.options[option_index] }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Step 3: Resume Upload -->
+            <div id="step3" class="step-content hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Upload Your Resume</h2>
+                <div class="file-upload" id="dropZone" onclick="document.getElementById('file').click();">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <h3 class="text-xl font-semibold mb-2">Drag and drop your resume here</h3>
+                    <p class="text-gray-600 mb-4">or click to browse</p>
+                    <input type="file" 
+                           id="file" 
+                           name="file" 
+                           accept=".pdf"
+                           class="hidden"
+                           onchange="handleFileSelect(this)">
+                    <p id="fileName" class="text-sm text-gray-500 mt-2"></p>
+                </div>
+            </div>
+
+            {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons">
+                <button type="button" 
+                        id="prevBtn" 
+                        class="nav-button prev" 
+                        onclick="prevStep()" 
+                        disabled>
+                    <i class="fas fa-arrow-left"></i>
+                    Previous
+                </button>
+                <button type="button" 
+                        id="nextBtn" 
+                        class="nav-button next" 
+                        onclick="nextStep()">
+                    Next
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <input type="hidden" id="selectedField" name="selectedField">
+            <input type="hidden" id="answers" name="answers">
+        </form>
+
+        {% if roadmap %}
+        <div class="roadmap mt-8">
+            <pre>{{ roadmap }}</pre>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedField = '';
+        const totalSteps = 3;
+
+        function updateProgressBar() {
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function selectField(field) {
+            selectedField = field;
+            document.getElementById('selectedField').value = field;
+            
+            // Remove selection from all cards
+            document.querySelectorAll('.field-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            document.querySelector(`[data-field="${field}"]`).classList.add('selected');
+            
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function selectOption(optionCard) {
+            // Remove selected class from all options in the same question
+            const questionCard = optionCard.closest('.question-card');
+            questionCard.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            optionCard.classList.add('selected');
+            
+            // Check the radio button
+            const radio = optionCard.querySelector('input[type="radio"]');
+            radio.checked = true;
+            
+            // Update progress
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const totalQuestions = document.querySelectorAll(`#${selectedField}_questions .question-card`).length;
+            const answeredQuestions = document.querySelectorAll(`#${selectedField}_questions input[type="radio"]:checked`).length;
+            
+            // Enable/disable next button based on all questions being answered
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentStep === 2) {
+                nextBtn.disabled = answeredQuestions < totalQuestions;
+            }
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            if (step === 2) {
+                document.querySelectorAll('.field-questions').forEach(el => {
+                    el.classList.add('hidden');
+                });
+                document.getElementById(`${selectedField}_questions`).classList.remove('hidden');
+            }
+
+            // Update buttons
+            document.getElementById('prevBtn').disabled = step === 1;
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.innerHTML = step === totalSteps ? 'Generate Roadmap <i class="fas fa-paper-plane"></i>' : 'Next <i class="fas fa-arrow-right"></i>';
+            
+            currentStep = step;
+            updateProgressBar();
+        }
+
+        function nextStep() {
+            if (currentStep === totalSteps) {
+                submitForm();
+                return;
+            }
+
+            if (currentStep === 1 && !selectedField) {
+                alert('Please select a field to continue');
+                return;
+            }
+
+            if (currentStep === 2) {
+                const answers = collectAnswers();
+                if (!answers) {
+                    alert('Please answer all questions to continue');
+                    return;
+                }
+                document.getElementById('answers').value = JSON.stringify(answers);
+            }
+
+            showStep(currentStep + 1);
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        function collectAnswers() {
+            const answers = [];
+            const questions = document.querySelectorAll(`#${selectedField}_questions .question-card`);
+            let allAnswered = true;
+
+            questions.forEach(question => {
+                const selected = question.querySelector('input[type="radio"]:checked');
+                if (selected) {
+                    answers.push(selected.value);
+                } else {
+                    allAnswered = false;
+                }
+            });
+
+            return allAnswered ? answers : null;
+        }
+
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('nextBtn').disabled = false;
+                
+                // Add success indicator
+                const dropZone = document.getElementById('dropZone');
+                dropZone.style.borderColor = '#4f46e5';
+                dropZone.style.backgroundColor = '#f8f9ff';
+                
+                // Update icon to show success
+                const icon = dropZone.querySelector('.upload-icon');
+                icon.classList.remove('fa-cloud-upload-alt');
+                icon.classList.add('fa-check-circle');
+                icon.style.color = '#4f46e5';
+            }
+        }
+
+        function updateNextButtonState() {
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentStep === 3) {
+                const fileInput = document.getElementById('file');
+                nextBtn.disabled = !fileInput.files.length;
+            }
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            if (step === 2) {
+                document.querySelectorAll('.field-questions').forEach(el => {
+                    el.classList.add('hidden');
+                });
+                document.getElementById(`${selectedField}_questions`).classList.remove('hidden');
+            }
+
+            // Update buttons
+            document.getElementById('prevBtn').disabled = step === 1;
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.innerHTML = step === totalSteps ? 'Generate Roadmap <i class="fas fa-paper-plane"></i>' : 'Next <i class="fas fa-arrow-right"></i>';
+            
+            // Update next button state for file upload
+            if (step === 3) {
+                updateNextButtonState();
+            }
+            
+            currentStep = step;
+            updateProgressBar();
+        }
+
+        // Drag and drop handling
+        const dropZone = document.getElementById('dropZone');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropZone.classList.add('dragging');
+        }
+
+        function unhighlight(e) {
+            dropZone.classList.remove('dragging');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                document.getElementById('file').files = files;
+                handleFileSelect(document.getElementById('file'));
+            }
+        }
+
+        function submitForm() {
+            const form = document.getElementById('roadmapForm');
+            const submitBtn = document.getElementById('nextBtn');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+            `;
+            
+            form.submit();
+        }
+
+        // Initialize
+        updateProgressBar();
+        
+        // Add animation delay to question cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const questionCards = document.querySelectorAll('.question-card');
+            questionCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>

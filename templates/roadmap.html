@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Career Roadmap</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f6f7ff 0%, #f0f3ff 100%);
+            min-height: 100vh;
+        }
+        .roadmap-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .week-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s forwards;
+        }
+        .week-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .week-number {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.2;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+        }
+        .task-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-item:hover {
+            transform: translateX(10px);
+        }
+        .task-icon {
+            color: #4f46e5;
+            margin-right: 1rem;
+            margin-top: 0.25rem;
+        }
+        .resource-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .resource-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .resource-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .resource-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .action-button.primary {
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            color: white;
+        }
+        .action-button.secondary {
+            background: white;
+            color: #4f46e5;
+            border: 2px solid #4f46e5;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="roadmap-header">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold mb-4">Your 12-Week Career Roadmap</h1>
+            <p class="text-xl opacity-90">Personalized learning path for your career growth</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        {% if roadmap %}
+            {% set sections = roadmap.split('\n\n') %}
+            {% for section in sections %}
+                {% if section.strip() %}
+                    {% if "Week" in section %}
+                        {% set week_lines = section.split('\n') %}
+                        <div class="week-card relative" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+                            <div class="week-number">{{ loop.index }}</div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ week_lines[0] }}</h2>
+                            <ul class="task-list space-y-3">
+                                {% for line in week_lines[1:] %}
+                                    {% if line.strip() %}
+                                        <li class="task-item">
+                                            <i class="fas fa-check-circle task-icon"></i>
+                                            <span class="text-gray-700">{{ line }}</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        <div class="overview-section bg-white rounded-2xl p-6 mb-8 shadow-lg">
+                            <div class="prose max-w-none">
+                                {{ section | safe }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            <div class="action-buttons">
+                <button onclick="window.print()" class="action-button primary">
+                    <i class="fas fa-download mr-2"></i>
+                    Download Roadmap
+                </button>
+                <a href="/" class="action-button secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Home
+                </a>
+                <a href="/chatbot" class="action-button primary">
+                    <i class="fas fa-comments mr-2"></i>
+                    Chat Assistant
+                </a>
+                <a href="/jobs" class="action-button primary">
+                    <i class="fas fa-briefcase mr-2"></i>
+                    Find Jobs
+                </a>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <h2 class="text-2xl font-bold text-gray-900">No roadmap generated yet</h2>
+                <p class="text-gray-600 mt-2">Please go back and complete the form to generate your roadmap.</p>
+                <a href="/" class="action-button secondary mt-6 inline-flex">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Home
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add animation delay to week cards
+            const weekCards = document.querySelectorAll('.week-card');
+            weekCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
