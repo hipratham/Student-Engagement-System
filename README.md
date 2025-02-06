@@ -1,4 +1,25 @@
-# CV Generator Application - Production Deployment Guide
+# CV Generator Application
+
+## Easy Installation Instructions
+
+### Prerequisites
+1. Install Python 3.8 or higher from [Python.org](https://www.python.org/downloads/)
+   - During installation, make sure to check "Add Python to PATH"
+
+### Installation Steps
+1. Download and extract this folder to your computer
+2. Double-click `setup.bat` to install all required packages
+3. Double-click `start.bat` to run the application
+4. Open your web browser and go to: http://127.0.0.1:8000
+
+That's it! The application will be running on your computer.
+
+### Troubleshooting
+- If you see any errors during setup, make sure Python is installed correctly
+- If you need to reinstall packages, just run `setup.bat` again
+- If the application doesn't start, make sure no other application is using port 8000
+
+## For Advanced Users
 
 ## Prerequisites
 - Python 3.8+
